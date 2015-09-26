@@ -67,6 +67,10 @@ func main() {
             r:    tl.NewRectangle(X + TilePos[i] * (TileWidth + BorderWidth), Y - i * (TileHeight + BorderHeight), TileWidth, TileHeight, tl.ColorBlack),
         })
     }
+    level.AddEntity(tl.NewText(X + TileWidth / 2 - 1, Y + TileHeight, "←", tl.ColorBlack, tl.ColorWhite))
+    level.AddEntity(tl.NewText(X + (TileWidth + BorderWidth) + TileWidth / 2 - 1, Y + TileHeight, "↓", tl.ColorBlack, tl.ColorWhite))
+    level.AddEntity(tl.NewText(X + 2 * (TileWidth + BorderWidth) + TileWidth / 2 - 1, Y + TileHeight, "↑", tl.ColorBlack, tl.ColorWhite))
+    level.AddEntity(tl.NewText(X + 3 * (TileWidth + BorderWidth) + TileWidth / 2 - 1, Y + TileHeight, "→", tl.ColorBlack, tl.ColorWhite))
     game.Screen().SetLevel(level)
     game.Start()
 }
