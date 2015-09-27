@@ -1,7 +1,9 @@
 package main
 
 import (
+    "fmt"
     tl "github.com/JoelOtter/termloop"
+    "math"
     "math/rand"
     "time"
 )
@@ -11,7 +13,8 @@ var (
     TileHeight = 7
     BorderWidth = 1
     BorderHeight = 1
-    X = 5
+    Time = 10.0
+    X = 10
     Y = 15
     TilePos [4]int
 )
@@ -55,6 +58,19 @@ func (r *Tile) Tick(ev tl.Event) {
     }
 }
 
+type RemainingTime struct {
+    r *tl.Text
+    t float64
+}
+
+func (r *RemainingTime) Draw(s *tl.Screen) {
+    r.t = math.Max(r.t - s.TimeDelta(), 0)
+    r.r.SetText(fmt.Sprintf("%.3f", r.t))
+    r.r.Draw(s)
+}
+
+func (r *RemainingTime) Tick(ev tl.Event) {}
+
 func main() {
     rand.Seed(time.Now().UTC().UnixNano())
     game := tl.NewGame()
@@ -71,6 +87,10 @@ func main() {
     level.AddEntity(tl.NewText(X + (TileWidth + BorderWidth) + TileWidth / 2 - 1, Y + TileHeight, "↓", tl.ColorBlack, tl.ColorWhite))
     level.AddEntity(tl.NewText(X + 2 * (TileWidth + BorderWidth) + TileWidth / 2 - 1, Y + TileHeight, "↑", tl.ColorBlack, tl.ColorWhite))
     level.AddEntity(tl.NewText(X + 3 * (TileWidth + BorderWidth) + TileWidth / 2 - 1, Y + TileHeight, "→", tl.ColorBlack, tl.ColorWhite))
+    level.AddEntity(&RemainingTime{
+        r:    tl.NewText(0, 0, fmt.Sprintf("%.3f", Time), tl.ColorRed, tl.ColorDefault),
+        t:    Time,
+    })
     game.Screen().SetLevel(level)
     game.Start()
 }
