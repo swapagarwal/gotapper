@@ -9,7 +9,7 @@ import (
     "time"
 )
 
-var (
+const (
     TileWidth = 10
     TileHeight = 7
     BorderWidth = 1
@@ -17,7 +17,11 @@ var (
     Time = 10.0
     X = 10
     Y = 15
+)
+
+var (
     Response = 0
+    Status = 1
     TilePos [4]int
 )
 
@@ -33,38 +37,40 @@ func (r *Tile) Position() (int, int) { return r.r.Position() }
 
 func (r *Tile) Tick(ev tl.Event) {
     if ev.Type == tl.EventKey {
-        r.px, r.py = r.r.Position()
-        if ty := r.py + TileHeight + BorderHeight; ty > Y {
-            Response = 2
-            switch ev.Key {
-            case tl.KeyArrowLeft:
-                if TilePos[0] == 0 {
-                    Response = 1
+        if Status == 1 {
+            r.px, r.py = r.r.Position()
+            if ty := r.py + TileHeight + BorderHeight; ty > Y {
+                Response = 2
+                switch ev.Key {
+                case tl.KeyArrowLeft:
+                    if TilePos[0] == 0 {
+                        Response = 1
+                    }
+                    break
+                case tl.KeyArrowDown:
+                    if TilePos[0] == 1 {
+                        Response = 1
+                    }
+                    break
+                case tl.KeyArrowUp:
+                    if TilePos[0] == 2 {
+                        Response = 1
+                    }
+                    break
+                case tl.KeyArrowRight:
+                    if TilePos[0] == 3 {
+                        Response = 1
+                    }
+                    break
                 }
-                break
-            case tl.KeyArrowDown:
-                if TilePos[0] == 1 {
-                    Response = 1
-                }
-                break
-            case tl.KeyArrowUp:
-                if TilePos[0] == 2 {
-                    Response = 1
-                }
-                break
-            case tl.KeyArrowRight:
-                if TilePos[0] == 3 {
-                    Response = 1
-                }
-                break
+                TilePos[0] = TilePos[1]
+                TilePos[1] = TilePos[2]
+                TilePos[2] = TilePos[3]
+                TilePos[3] = rand.Intn(4)
+                r.r.SetPosition(X + TilePos[3] * (TileWidth + BorderWidth), Y - 3 * (TileHeight + BorderHeight))
+            } else {
+                r.r.SetPosition(r.px, ty)
             }
-            TilePos[0] = TilePos[1]
-            TilePos[1] = TilePos[2]
-            TilePos[2] = TilePos[3]
-            TilePos[3] = rand.Intn(4)
-            r.r.SetPosition(X + TilePos[3] * (TileWidth + BorderWidth), Y - 3 * (TileHeight + BorderHeight))
-        } else {
-            r.r.SetPosition(r.px, ty)
         }
     }
 }
@@ -76,16 +82,21 @@ type RemainingTime struct {
 }
 
 func (r *RemainingTime) Draw(s *tl.Screen) {
-    r.t = math.Max(r.t - s.TimeDelta(), 0)
-    if Response == 1 {
-        r.t = r.t + 10
-        s, _ := strconv.Atoi(r.s.Text())
-        r.s.SetText(strconv.Itoa(s + 1))
-    } else if Response == 2 {
-        r.t = r.t - 5
+    if Status == 1 {
+        r.t = math.Max(r.t - s.TimeDelta(), 0)
+        if r.t == 0 {
+            Status = 0
+        } else {
+            if Response == 1 {
+                s, _ := strconv.Atoi(r.s.Text())
+                r.s.SetText(strconv.Itoa(s + 1))
+            } else if Response == 2 {
+                Status = 0
+            }
+        }
+        Response = 0
+        r.r.SetText(fmt.Sprintf("%.3f", r.t))
     }
-    Response = 0
-    r.r.SetText(fmt.Sprintf("%.3f", r.t))
     r.r.Draw(s)
     r.s.Draw(s)
 }
