@@ -79,6 +79,8 @@ type RemainingTime struct {
     r *tl.Text
     s *tl.Text
     t float64
+    m *tl.Text
+    e *tl.Text
 }
 
 func (r *RemainingTime) Draw(s *tl.Screen) {
@@ -86,12 +88,44 @@ func (r *RemainingTime) Draw(s *tl.Screen) {
         r.t = math.Max(r.t - s.TimeDelta(), 0)
         if r.t == 0 {
             Status = 0
+            r.e.SetText("Time up!")
         } else {
             if Response == 1 {
                 s, _ := strconv.Atoi(r.s.Text())
-                r.s.SetText(strconv.Itoa(s + 1))
+                s = s + 1
+                if s % 5 == 0 {
+                    r.t = r.t + 1
+                }
+                r.s.SetText(strconv.Itoa(s))
+                switch s {
+                    case 10:
+                        r.m.SetText("You've got it!")
+                    case 20:
+                        r.m.SetText("Keep going!")
+                    case 30:
+                        r.m.SetText("You're doing great!")
+                    case 40:
+                        r.m.SetText("You rock!")
+                    case 50:
+                        r.m.SetText("Don't stop!")
+                    case 60:
+                        r.m.SetText("I like your style!")
+                    case 70:
+                        r.m.SetText("Awesome!")
+                    case 80:
+                        r.m.SetText("How do you do that?")
+                    case 90:
+                        r.m.SetText("Don't ever stop!!")
+                    case 100:
+                        r.m.SetText("I'm really impressed.")
+                    case 150:
+                        r.m.SetText("You're really still here?")
+                    case 200:
+                        r.m.SetText("That's incredible!")
+                }
             } else if Response == 2 {
                 Status = 0
+                r.e.SetText("Game Over")
             }
         }
         Response = 0
@@ -99,6 +133,8 @@ func (r *RemainingTime) Draw(s *tl.Screen) {
     }
     r.r.Draw(s)
     r.s.Draw(s)
+    r.m.Draw(s)
+    r.e.Draw(s)
 }
 
 func (r *RemainingTime) Tick(ev tl.Event) {}
@@ -123,6 +159,8 @@ func main() {
         r:    tl.NewText(X + 4 * (TileWidth + BorderWidth), 0, fmt.Sprintf("%.3f", Time), tl.ColorRed, tl.ColorDefault),
         s:    tl.NewText(0, 0, "0", tl.ColorRed, tl.ColorDefault),
         t:    Time,
+        m:    tl.NewText(0, Y + TileHeight + 1, "", tl.ColorRed, tl.ColorDefault),
+        e:    tl.NewText(X + 4 * (TileWidth + BorderWidth), Y + TileHeight + 1, "", tl.ColorRed, tl.ColorDefault),
     })
     game.Screen().SetLevel(level)
     game.Start()
