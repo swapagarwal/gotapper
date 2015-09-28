@@ -63,6 +63,28 @@ func (r *Tile) Tick(ev tl.Event) {
                     }
                     break
                 }
+                switch ev.Ch {
+                case 'h', 'a', 'z':
+                    if TilePos[0] == 0 {
+                        Response = 1
+                    }
+                    break
+                case 'j', 's', 'x':
+                    if TilePos[0] == 1 {
+                        Response = 1
+                    }
+                    break
+                case 'k', 'd', 'c':
+                    if TilePos[0] == 2 {
+                        Response = 1
+                    }
+                    break
+                case 'l', 'f', 'v':
+                    if TilePos[0] == 3 {
+                        Response = 1
+                    }
+                    break
+                }
                 TilePos[0] = TilePos[1]
                 TilePos[1] = TilePos[2]
                 TilePos[2] = TilePos[3]
